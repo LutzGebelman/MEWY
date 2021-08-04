@@ -1,6 +1,17 @@
-TOOL.Category = "Fuck My Ass"
-TOOL.Name = "Watch this tool"
+TOOL.Category = "Lutz's Tools"
+TOOL.Name = "MEWY"
 TOOL.Commnad = nil
+TOOL.ConfigName = ""
+TOOL.ents_list = {}
+TOOL.BackgroundColor = Color(0, 0, 0, 0)
+if CLIENT then
+    language.Add("Tool.mewy.name", "MEWY")
+    language.Add("Tool.mewy.desc", "Make any entity watch after you")
+    language.Add("Tool.mewy.0", "LMB to make object follow you; RMB to make it stop.")
+    language.Add("Undone.mewy", "undone!")
+end
+
+if SERVER then end
 
 local function my_rad_to_deg(rad)
     deg = rad * 180/math.pi
@@ -26,8 +37,10 @@ local function calcucate_angle(ply, ent)
 end
 
 function TOOL:LeftClick(trace)
-    ent = trace["Entity"]
-    ply = self:GetOwner()
+    local ent = trace["Entity"]
+    local ply = self:GetOwner()
+
+    table.insert(self.ents_list, ent:EntIndex(), ent)
     function ent:Think()
         calcucate_angle(ply, ent)
         return true
@@ -36,9 +49,31 @@ function TOOL:LeftClick(trace)
 end
 
 function TOOL:RightClick(trace)
-    return false
+    local ent = trace["Entity"]
+    local ply = self:GetOwner()
+    function ent:Think()
+        return false
+    end
+
+    return true
 end
 
 function TOOL:Reload(trace)
+    self.BackgroundColor = ColorRand(false)
     return false
 end
+
+function TOOL:DrawToolScreen(width, hight)
+    surface.SetDrawColor(self.BackgroundColor)
+    surface.DrawRect(0, 0, width, hight)
+    str_ents_list = table.ToString(self.ents_list, nil, true)
+    draw.SimpleText("Lutz's Tools MEWY", "DermaLarge", width / 2, hight / 2, Color(200, 200, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
+end
+
+hook.Add("PreUndo", "Delete item from ent's list", function(undo)
+    ent = undo.Entities[1]
+    ply = undo.Owner
+    if ply:GetTool()["ents_list"][ent:EntIndex()] != nil then
+        table.remove(ply:GetTool()["ents_list"], ent:EntIndex())
+    end
+end)
