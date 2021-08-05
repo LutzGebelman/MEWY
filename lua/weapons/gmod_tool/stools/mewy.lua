@@ -73,7 +73,7 @@ end
 hook.Add("PreUndo", "Delete item from ent's list", function(undo)
     ent = undo.Entities[1]
     ply = undo.Owner
-    if ply:GetTool()["Name"] == "MEWY" and ply:GetTool()["ents_list"][ent:EntIndex()] != nil then
+    if ply:GetTool() != nil and ply:GetTool()["Name"] == "MEWY" and ply:GetTool()["ents_list"][ent:EntIndex()] != nil then
         table.remove(ply:GetTool()["ents_list"], ent:EntIndex())
     end
 end)
