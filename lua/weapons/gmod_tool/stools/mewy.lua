@@ -2,7 +2,7 @@ TOOL.Category = "Lutz's Tools"
 TOOL.Name = "MEWY"
 TOOL.Commnad = nil
 TOOL.ConfigName = ""
-local ents_list = {}
+ents_list = {}
 TOOL.BackgroundColor = Color(0, 0, 0, 0)
 if CLIENT then
     language.Add("Tool.mewy.name", "MEWY")
