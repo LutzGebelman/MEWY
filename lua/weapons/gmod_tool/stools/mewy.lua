@@ -2,7 +2,7 @@ TOOL.Category = "Lutz's Tools"
 TOOL.Name = "MEWY"
 TOOL.Commnad = nil
 TOOL.ConfigName = ""
-TOOL.ents_list = {}
+local ents_list = {}
 TOOL.BackgroundColor = Color(0, 0, 0, 0)
 if CLIENT then
     language.Add("Tool.mewy.name", "MEWY")
@@ -39,8 +39,8 @@ end
 function TOOL:LeftClick(trace)
     local ent = trace["Entity"]
     local ply = self:GetOwner()
-
-    table.insert(self.ents_list, ent:EntIndex(), ent)
+    print(ent:EntIndex())
+    table.insert(ents_list, ent:EntIndex(), ent)
     function ent:Think()
         calcucate_angle(ply, ent)
         return true
@@ -51,14 +51,15 @@ end
 function TOOL:RightClick(trace)
     local ent = trace["Entity"]
     local ply = self:GetOwner()
+    table.remove(ents_list, ent:EntIndex())
     function ent:Think()
         return false
     end
-
     return true
 end
 
 function TOOL:Reload(trace)
+    PrintTable(ents_list)
     self.BackgroundColor = ColorRand(false)
     return false
 end
@@ -66,14 +67,14 @@ end
 function TOOL:DrawToolScreen(width, hight)
     surface.SetDrawColor(self.BackgroundColor)
     surface.DrawRect(0, 0, width, hight)
-    str_ents_list = table.ToString(self.ents_list, nil, true)
+    str_ents_list = table.ToString(ents_list, nil, true)
     draw.SimpleText("Lutz's Tools MEWY", "DermaLarge", width / 2, hight / 2, Color(200, 200, 200), TEXT_ALIGN_CENTER, TEXT_ALIGN_CENTER)
 end
 
 hook.Add("PreUndo", "Delete item from ent's list", function(undo)
-    ent = undo.Entities[1]
-    ply = undo.Owner
-    if ply:GetTool() != nil and ply:GetTool()["Name"] == "MEWY" and ply:GetTool()["ents_list"][ent:EntIndex()] != nil then
-        table.remove(ply:GetTool()["ents_list"], ent:EntIndex())
+    local ent = undo.Entities[1]
+    local ply = undo.Owner
+    if ply:GetTool() != nil and ply:GetTool()["Name"] == "MEWY" and ents_list[ent:EntIndex()] != nil then
+        table.remove(ents_list, ent:EntIndex())
     end
 end)
